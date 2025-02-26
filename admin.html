@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(45deg, #ff4b1f, #1fddff, #ff1fa0);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            color: white;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        h2, h3 {
+            margin-top: 20px;
+        }
+        input {
+            margin: 5px;
+            padding: 10px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 15px;
+        }
+        #message {
+            margin-top: 20px;
+        }
+        #studentDetails {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Admin Dashboard</h2>
+
+    <h3>Add Student</h3>
+    <input type="text" id="regNo" placeholder="Registration No">
+    <input type="text" id="studentName" placeholder="Student Name">
+    <input type="text" id="course" placeholder="Course">
+    <input type="text" id="semester" placeholder="Semester">
+    <input type="number" id="pendingFees" placeholder="Pending Fees">
+    <button onclick="addStudent()">Add Student</button>
+
+    <h3>Remove Student</h3>
+    <input type="text" id="removeRegNo" placeholder="Registration No">
+    <button onclick="fetchStudentForRemoval()">Fetch Student</button>
+    <div id="studentDetails"></div>
+    <button id="confirmRemove" style="display:none;" onclick="removeStudent()">Remove Student</button>
+
+    <div id="message"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzBamUj9iiepkmwNRe5BQiq7Lx9LuiSRs",
+            authDomain: "studentinfo-53664.firebaseapp.com",
+            projectId: "studentinfo-53664",
+            storageBucket: "studentinfo-53664.firebasestorage.app",
+            messagingSenderId: "762526300120",
+            appId: "1:762526300120:web:540328cdd001266ee464ad"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function addStudent() {
+            const regNo = document.getElementById("regNo").value;
+            const studentName = document.getElementById("studentName").value;
+            const course = document.getElementById("course").value;
+            const semester = document.getElementById("semester").value;
+            const pendingFees = document.getElementById("pendingFees").value;
+
+            // Check if the student already exists
+            const studentRef = doc(db, "students", regNo);
+            const studentSnap = await getDoc(studentRef);
+            if (studentSnap.exists()) {
+                document.getElementById("message").textContent = "Registration No already in use!";
+                return;
+            }
+
+            await setDoc(studentRef, {
+                Name: studentName,
+                Course: course,
+                Semester: semester,
+                PendingFees: pendingFees,
+                Subjects: [] // You can add subjects later
+            });
+
+            document.getElementById("message").textContent = "Student added successfully!";
+        }
+
+        async function fetchStudentForRemoval() {
+            const regNo = document.getElementById("removeRegNo").value;
+            const studentRef = doc(db, "students", regNo);
+            const studentSnap = await getDoc(studentRef);
+
+if (studentSnap.exists()) {
+                const studentData = studentSnap.data();
+                document.getElementById("studentDetails").textContent = Name: ${studentData.Name}, Course: ${studentData.Course};
+                document.getElementById("confirmRemove").style.display = "inline-block";
+            } else {
+                document.getElementById("studentDetails").textContent = "No student found with this Registration No.";
+                document.getElementById("confirmRemove").style.display = "none";
+            }
+        }
+
+        async function removeStudent() {
+            const regNo = document.getElementById("removeRegNo").value;
+
+            await deleteDoc(doc(db, "students", regNo));
+
+            document.getElementById("message").textContent = "Student removed successfully!";
+            document.getElementById("studentDetails").textContent = "";
+            document.getElementById("confirmRemove").style.display = "none";
+        }
+    </script>
+</body>
+</html>

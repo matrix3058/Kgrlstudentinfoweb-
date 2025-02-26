@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGRL Student Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(45deg, #ff4b1f, #1fddff, #ff1fa0);
+            background-size: 400% 400%;
+            animation: gradientBG 5s infinite alternate;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        h2 {
+            color: white;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #fff;
+            cursor: pointer;
+        }
+        a {
+            color: yellow;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>Welcome to KGRL Student Info</h2><input type="email" id="email" placeholder="Enter Email">
+<input type="password" id="password" placeholder="Enter Password">
+<button onclick="login()">Login</button>
+
+<br>
+<a href="https://www.instagram.com/mr__che.__?igsh=YzljYTk1ODg3Zg==" target="_blank">Follow Us on Instagram</a>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAzBamUj9iiepkmwNRe5BQiq7Lx9LuiSRs",
+        authDomain: "studentinfo-53664.firebaseapp.com",
+        projectId: "studentinfo-53664",
+        storageBucket: "studentinfo-53664.firebasestorage.app",
+        messagingSenderId: "762526300120",
+        appId: "1:762526300120:web:540328cdd001266ee464ad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function login() {
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                alert("Login Successful!");
+                window.location.href = "dashboard.html";
+            })
+            .catch((error) => {
+                alert("Error: " + error.message);
+            });
+    }
+</script>
+
+</body>
+</html>

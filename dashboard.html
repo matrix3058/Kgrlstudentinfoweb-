@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(45deg, #ff4b1f, #1fddff, #ff1fa0);
+            background-size: 400% 400%;
+            animation: gradientBG 5s infinite alternate;
+            color: white;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        h2 { margin-top: 20px; }
+        .container {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        p { font-size: 18px; margin: 10px 0; }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Welcome, <span id="student-name"></span></h2>
+    <div class="container">
+        <p><b>Course:</b> <span id="course"></span></p>
+        <p><b>Semester:</b> <span id="semester"></span></p>
+        <p><b>Pending Fees:</b> <span id="fees"></span></p>
+        <p><b>Subjects:</b> <span id="subjects"></span></p>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzBamUj9iiepkmwNRe5BQiq7Lx9LuiSRs",
+            authDomain: "studentinfo-53664.firebaseapp.com",
+            projectId: "studentinfo-53664",
+            storageBucket: "studentinfo-53664.appspot.com",
+            messagingSenderId: "762526300120",
+            appId: "1:762526300120:web:540328cdd001266ee464ad"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Function to fetch student data
+        async function fetchStudentData(email) {
+            const studentRef = doc(db, "students", email);
+            const studentSnap = await getDoc(studentRef);
+
+            if (studentSnap.exists()) {
+                document.getElementById("student-name").textContent = studentSnap.data().Name || "N/A";
+                document.getElementById("course").textContent = studentSnap.data().Course || "N/A";
+                document.getElementById("semester").textContent = studentSnap.data().Semester || "N/A";
+                document.getElementById("fees").textContent = studentSnap.data().PendingFees || "No pending fees";
+                document.getElementById("subjects").textContent = studentSnap.data().Subjects?.join(", ") || "No subjects available";
+            } else {
+                alert("No student data found!");
+                window.location.href = "index.html";
+            }
+        }
+
+        // Check if user is logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchStudentData(user.email);
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Logout function
+        function logout() {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            }).catch(error => {
+                alert("Error Logging Out: " + error.message);
+            });
+        }
+    </script>
+
+</body>
+</html>
